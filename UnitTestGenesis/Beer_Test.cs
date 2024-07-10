@@ -1,6 +1,7 @@
 ﻿using Genesis_test.Controllers;
 using Genesis_test.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace UnitTestGenesis;
 
@@ -38,7 +39,6 @@ public class Beer_Test: UnitTestBase
     }
 
     [Fact]
-    // test put beer
     public void PutBeer()
     {
         var context = GetPopulateDataContext();
@@ -83,6 +83,31 @@ public class Beer_Test: UnitTestBase
         var result = controller.PutBeer(2, beer);
 
         Assert.IsType<BadRequestResult>(result.Result);
+    }
+
+    [Fact]
+    public  void PostBeer()
+    {
+        var context = GetPopulateDataContext();
+
+        var controller = new BeersController(context);
+
+        var beer = new Beer
+        {
+            Name = "Beer_posted",
+            BrewerId = 1,
+            Degree = 5.2,
+            Price = 1.75
+        };
+
+        var result = controller.PostBeer(beer);
+        var actionResult = Assert.IsType<ActionResult<Beer>>(result.Result);
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+        var returnValue = Assert.IsType<Beer>(createdAtActionResult.Value);
+
+        Assert.Equal(beer.Name, returnValue.Name);
+
+
     }
 
     [Fact]

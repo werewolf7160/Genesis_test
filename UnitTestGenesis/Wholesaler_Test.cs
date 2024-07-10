@@ -17,7 +17,7 @@ public class Wholesaler_Test : UnitTestBase
         var wholesalers = controller.GetWholesalers();
 
         var returnValue = Assert.IsType<ActionResult<IEnumerable<Wholesaler>>>(wholesalers.Result);
-        var value = Assert.IsType<List<Beer>>(returnValue.Value);
+        var value = Assert.IsType<List<Wholesaler>>(returnValue.Value);
 
         Assert.Equal(NbWholesalers, value.Count);
     }
@@ -32,9 +32,26 @@ public class Wholesaler_Test : UnitTestBase
         var wholesaler = controller.GetWholesaler(1);
 
         var returnValue = Assert.IsType<ActionResult<Wholesaler>>(wholesaler.Result);
-        var value = Assert.IsType<Beer>(returnValue.Value);
+        var value = Assert.IsType<Wholesaler>(returnValue.Value);
 
         Assert.Equal(1, value.Id);
+    }
+
+    [Fact]
+    public void PostWholesaler()
+    {
+        var context = GetPopulateDataContext();
+
+        var controller = new WholesalersController(context);
+
+        var wholesaler = new Wholesaler() { Name = "Wholesaler3" };
+
+        var result = controller.PostWholeSaler(wholesaler);
+        var actionResult = Assert.IsType<ActionResult<Wholesaler>>(result.Result);
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+        var returnValue = Assert.IsType<Wholesaler>(createdAtActionResult.Value);
+
+        Assert.Equal(wholesaler.Name, returnValue.Name);
     }
 
 

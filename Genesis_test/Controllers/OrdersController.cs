@@ -87,23 +87,22 @@ namespace Genesis_test.Controllers
 
             //set reduction
             var reduction = 0.0;
-            if(order.Lines.Count >= 10)
+            if (order.Lines.Sum(x => x.Quantity) >= 20)
+                    reduction = 0.2;
+            else if (order.Lines.Sum(x => x.Quantity) >= 10)
                 reduction = 0.1;
-            else if(order.Lines.Count >= 20)
-                reduction = 0.2;
 
             foreach (var line in order.Lines)
             {
                 //check minimum quantity
                 if(line.Quantity <= 0)
                     return BadRequest("Quantity must be greater than 0");
-
                 //get stock
                 var stock = await _context.Stocks.FirstOrDefaultAsync(x => x.BeerId == line.BeerId && x.WholesalerId == order.WholesalerId);
 
                 //check if beer exists in stock
                 if(stock == null)
-                    return BadRequest($"Beer not found in stock of wholesaler {wholesaler.Name}");
+                    return BadRequest($"Wholesaler {wholesaler.Name} don't sale this beer");
 
                 //check if enough stock
                 if(stock.Nb < line.Quantity)
@@ -116,6 +115,8 @@ namespace Genesis_test.Controllers
 
             //update global TotalHt
             order.TotalHt = order.Lines.Sum(x => x.TotalHt);
+
+            order.TotalHt = Math.Round(order.TotalHt, 2);
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();

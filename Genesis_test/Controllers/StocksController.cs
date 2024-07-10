@@ -72,6 +72,10 @@ namespace Genesis_test.Controllers
         [HttpPost]
         public async Task<ActionResult<Stock>> PostStock(Stock stock)
         {
+            var stocked_stock = await _context.Stocks.FirstOrDefaultAsync(x => x.WholesalerId == stock.WholesalerId 
+                                                                               &&  x.BeerId == stock.BeerId);
+            if (stocked_stock != null)
+                return BadRequest("This beer already exist in this stock, please use update");
             _context.Stocks.Add(stock);
             await _context.SaveChangesAsync();
 

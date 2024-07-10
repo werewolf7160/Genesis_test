@@ -38,6 +38,42 @@ public class Stock_Test : UnitTestBase
     }
 
     [Fact]
+    public void PostStock()
+    {
+        var context = GetPopulateDataContext();
+
+        var controller = new StocksController(context);
+
+        var stock = new Stock() 
+            { WholesalerId = 2, BeerId = 3, Nb = 500 };
+
+        var result = controller.PostStock(stock);
+        var actionResult = Assert.IsType<ActionResult<Stock>>(result.Result);
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+        var returnValue = Assert.IsType<Stock>(createdAtActionResult.Value);
+
+        Assert.Equal(stock.Nb, returnValue.Nb);
+    }
+
+    [Fact]
+    //check duplicate
+    public void PostStockDuplicate()
+    {
+        var context = GetPopulateDataContext();
+
+        var controller = new StocksController(context);
+
+        var stock = new Stock(){ WholesalerId = 1, BeerId = 1, Nb = 100 };
+
+        var result = controller.PostStock(stock);
+
+        var actionResult = Assert.IsType<ActionResult<Stock>>(result.Result);
+        var res = Assert.IsType<BadRequestObjectResult>(actionResult.Result);
+        Assert.Matches("This beer already exist in this stock", res.Value.ToString());
+
+    }
+
+    [Fact]
     public void PutStock()
     {
         var context = GetPopulateDataContext();

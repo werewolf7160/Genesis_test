@@ -55,6 +55,27 @@ public class Brewer_Test : UnitTestBase
         Assert.Equal(nb, value.Count);
     }
 
+
+    [Fact]
+    public void PostBrewer()
+    {
+        var context = GetPopulateDataContext();
+
+        var controller = new BrewersController(context);
+
+        var brewer = new Brewer()
+        {
+            Name = "Brewer_posted",
+        };
+
+        var result = controller.PostBrewer(brewer);
+        var actionResult = Assert.IsType<ActionResult<Brewer>>(result.Result);
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+        var returnValue = Assert.IsType<Brewer>(createdAtActionResult.Value);
+
+        Assert.Equal(brewer.Name, returnValue.Name);
+    }
+
     [Fact]
     public void PutBrewer()
     {
